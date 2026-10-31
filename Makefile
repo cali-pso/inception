@@ -1,5 +1,5 @@
-LOGIN   ?= rapoggi
-export LOGIN
+# Single source of truth: LOGIN comes from srcs/.env (also read by compose).
+LOGIN    = $(shell sed -n 's/^LOGIN=//p' srcs/.env)
 
 COMPOSE  = docker compose -f srcs/docker-compose.yml
 DATA_DIR = /home/$(LOGIN)/data

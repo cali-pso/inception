@@ -24,8 +24,8 @@ Prerequisites (on the VM): Docker Engine, Docker Compose v2 plugin, `make`,
 make            # = mkdir data dirs + docker compose -f srcs/docker-compose.yml up -d --build
 ```
 
-The Makefile exports `LOGIN` (override with `make LOGIN=other`) which
-Compose uses for the volume paths. Dockerfiles are built by Compose from
+`LOGIN` is read from `srcs/.env` by both the Makefile (data directories)
+and Compose (volume paths). Dockerfiles are built by Compose from
 `srcs/requirements/<service>/`.
 
 ## Useful commands
