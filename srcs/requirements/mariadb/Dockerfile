@@ -10,7 +10,7 @@ RUN \
 	chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
 COPY config/ /etc/
-COPY main.sh /usr/local/bin/
+COPY tools/main.sh /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/main.sh
 

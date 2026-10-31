@@ -31,6 +31,20 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+  nginx:
+    build:
+      context: ./requirements/nginx
+      args: { ALPINE_VERSION: "3.23" }
+    image: nginx
+    restart: always
+    env_file: .env
+    ports:
+      - "443:443"
+    volumes:
+      - wp_data:/var/www/html:ro
+    networks: [inception]
+    depends_on:
+      - wordpress
 
 volumes:
   db_data:
