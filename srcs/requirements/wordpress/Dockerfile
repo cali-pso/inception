@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     curl -fsSL -o /usr/local/bin/wp \
         https://github.com/wp-cli/wp-cli/releases/download/v2.12.0/wp-cli-2.12.0.phar && \
     chmod +x /usr/local/bin/wp && \
-    adduser -S -G www-data www-data && \
+    (getent group www-data || addgroup -g 82 -S www-data) && \
+    (getent passwd www-data || adduser -u 82 -D -S -G www-data www-data) && \
     mkdir -p /var/www/html /run/php
 
 COPY conf/www.conf /etc/php83/php-fpm.d/www.conf
