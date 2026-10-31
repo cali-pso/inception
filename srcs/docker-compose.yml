@@ -36,6 +36,7 @@ services:
       context: ./requirements/nginx
       args: { ALPINE_VERSION: "3.23" }
     image: nginx
+    container_name: nginx
     restart: always
     env_file: .env
     ports:

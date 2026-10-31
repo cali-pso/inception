@@ -1,5 +1,2 @@
 srcs/.env
-secrets
-__pycache__
-en.subject.pdf
-compose-demo
+secrets/
