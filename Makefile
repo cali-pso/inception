@@ -7,7 +7,7 @@ SECRETS  = secrets/db_password.txt secrets/db_root_password.txt \
            secrets/wp_password.txt secrets/wp_admin_password.txt
 
 all: secrets
-	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress
+	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress $(DATA_DIR)/site
 	$(COMPOSE) up -d --build
 
 # Generate any missing secret file with a random password (never overwrites).

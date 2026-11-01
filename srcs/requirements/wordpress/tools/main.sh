@@ -25,6 +25,13 @@ if ! wp core is-installed --path="$WP_PATH" --allow-root; then
     wp user create "$WP_USER" "$WP_USER_EMAIL" \
         --path="$WP_PATH" --allow-root --role=author \
         --user_pass="$WP_USER_PASS"
+    wp config set WP_REDIS_HOST redis --path="$WP_PATH" --allow-root
+    wp config set WP_REDIS_PORT 6379 --raw --path="$WP_PATH" --allow-root
+
+    if ! wp plugin is-installed redis-cache --path="$WP_PATH" --allow-root; then
+        wp plugin install redis-cache --activate --path="$WP_PATH" --allow-root
+    fi
+    wp redis enable --path="$WP_PATH" --allow-root
 fi
 
 chown -R www-data:www-data "$WP_PATH"

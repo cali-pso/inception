@@ -9,7 +9,7 @@ RUN \
 	mkdir -p /run/mysqld /var/lib/mysql && \
 	chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
-COPY config/ /etc/
+COPY conf/ /etc/
 COPY tools/main.sh /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/main.sh
