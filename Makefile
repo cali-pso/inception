@@ -4,7 +4,8 @@ LOGIN    = $(shell sed -n 's/^LOGIN=//p' srcs/.env)
 COMPOSE  = docker compose -f srcs/docker-compose.yml
 DATA_DIR = /home/$(LOGIN)/data
 SECRETS  = secrets/db_password.txt secrets/db_root_password.txt \
-           secrets/wp_password.txt secrets/wp_admin_password.txt
+           secrets/wp_password.txt secrets/wp_admin_password.txt \
+		   secrets/ftp_password.txt
 
 all: secrets
 	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress $(DATA_DIR)/site

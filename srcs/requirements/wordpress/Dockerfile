@@ -6,6 +6,7 @@ RUN apk add --no-cache \
         php83-mbstring php83-xml php83-simplexml php83-gd php83-zip \
         php83-openssl php83-session php83-tokenizer php83-fileinfo \
         php83-iconv php83-ctype php83-exif php83-intl php83-pecl-redis \
+        php83-opcache \
         mariadb-client curl && \
     ln -s /usr/bin/php83 /usr/bin/php && \
     curl -fsSL -o /usr/local/bin/wp \
