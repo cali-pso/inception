@@ -48,6 +48,7 @@ services:
     networks: [inception]
     depends_on:
       - wordpress
+      - adminer
   redis:
     build:
       context: ./bonus/redis
@@ -79,9 +80,22 @@ services:
     secrets: [ftp_password]
     volumes:
       - wp_data:/srv/ftp/wp_data:rw
-      - site_data:/srv/ftp/site:rw
+      - site_data:/srv/ftp/site_data:rw
     networks: [inception] 
     ports: ["21:21", "21000-21010:21000-21010"]
+  adminer:
+    build:
+      context: ./bonus/adminer
+      args: { ALPINE_VERSION: "3.23" }
+    image: adminer
+    container_name: adminer
+    restart: always
+    networks: [inception]
+    depends_on:
+      mariadb:
+        condition: service_healthy
+        
+
 
 volumes:
   db_data:
