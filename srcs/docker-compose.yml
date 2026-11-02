@@ -1,4 +1,8 @@
 services:
+
+### REQUIREMENTS ###
+
+## MARIADB
   mariadb:
     healthcheck:
       test: ["CMD-SHELL", "mariadb-admin ping -h localhost --silent"]
@@ -16,6 +20,9 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks: [inception]
+
+
+## WORDPRESS
   wordpress:
     build:
       context: ./requirements/wordpress
@@ -33,6 +40,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+
+
+## NGINX
   nginx:
     build:
       context: ./requirements/nginx
@@ -49,6 +59,10 @@ services:
     depends_on:
       - wordpress
       - adminer
+
+### BONUSES ###
+
+## REDIS
   redis:
     build:
       context: ./bonus/redis
@@ -58,6 +72,9 @@ services:
     restart: always
     env_file: .env
     networks: [inception]
+
+
+## STATIC SITE
   site:
     build:
       context: ./bonus/site
@@ -69,6 +86,9 @@ services:
       - site_data:/usr/share/site:rw
     env_file: .env
     networks: [inception]
+
+
+## FTP SERVER
   ftp:
     build:
       context: ./bonus/ftp
@@ -83,6 +103,9 @@ services:
       - site_data:/srv/ftp/site_data:rw
     networks: [inception] 
     ports: ["21:21", "21000-21010:21000-21010"]
+
+
+## ADMINER
   adminer:
     build:
       context: ./bonus/adminer
@@ -94,8 +117,38 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-        
+    
+ 
+## OLLAMA
+  ollama:
+    healthcheck:
+        test: ["CMD", "ollama", "list"]
+        interval: 3s
+        timeout: 10s
+        retries: 5
+    build:
+      context: ./bonus/ollama
+      args: { ALPINE_VERSION: "3.23" }
+    image: ollama
+    container_name: ollama
+    restart: always
+    volumes: 
+      - ollama_data:/models
+    networks: [inception]
 
+## FLASK API
+  chat:
+    build:
+      context: ./bonus/chat
+      args: { ALPINE_VERSION: "3.23" }
+    image: chat
+    container_name: chat
+    env_file: .env
+    restart: always
+    networks: [inception]
+    depends_on:
+      ollama:
+        condition: service_healthy
 
 volumes:
   db_data:
@@ -116,6 +169,12 @@ volumes:
       type: none
       o: bind
       device: /home/${LOGIN}/data/site
+  ollama_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${LOGIN}/data/ollama
 
 networks:
   inception:

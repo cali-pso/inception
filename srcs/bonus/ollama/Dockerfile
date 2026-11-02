@@ -1,0 +1,8 @@
+ARG ALPINE_VERSION=3.23
+FROM alpine:${ALPINE_VERSION}
+
+RUN apk add --no-cache ollama
+ENV OLLAMA_HOST=0.0.0.0:11434 OLLAMA_MODELS=/models
+
+EXPOSE 11434
+ENTRYPOINT ["ollama", "serve"]
