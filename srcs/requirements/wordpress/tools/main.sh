@@ -33,9 +33,10 @@ wp config set WP_REDIS_PORT 6379 --raw --path="$WP_PATH" --allow-root
 wp config set WP_REDIS_GRACEFUL true --raw --path="$WP_PATH" --allow-root
 
 if ! wp plugin is-installed redis-cache --path="$WP_PATH" --allow-root; then
-    wp plugin install redis-cache --activate --path="$WP_PATH" --allow-root
+    wp plugin install redis-cache --activate --path="$WP_PATH" --allow-root || \
+        echo "warning: redis-cache install failed, continuing without object cache"
 fi
-wp redis enable --path="$WP_PATH" --allow-root
+wp redis enable --path="$WP_PATH" --allow-root || true
 
 chown -R www-data:www-data "$WP_PATH"
 exec php-fpm83 -F

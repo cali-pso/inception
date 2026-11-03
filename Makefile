@@ -33,4 +33,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all secrets down clean fclean re
+.PHONY: all secrets down clean fclean re pull-model

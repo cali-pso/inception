@@ -59,6 +59,8 @@ services:
     depends_on:
       - wordpress
       - adminer
+      - chat
+      - site
 
 ### BONUSES ###
 
