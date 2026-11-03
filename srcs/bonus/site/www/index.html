@@ -1,13 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inception Stack</title>
+<style>
+:root{
+  --bg:#f7f8fa; --surface:#ffffff; --fg:#17191d; --muted:#5d6470;
+  --line:#e2e5ea; --accent:#2f6fd0; --accent-soft:#e8f0fc;
+  --code-bg:#f2f4f7; --code-fg:#1f2937; --badge-bonus-bg:#eceef2; --badge-bonus-fg:#5d6470;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101317; --surface:#171b21; --fg:#e6e9ee; --muted:#9aa3b0;
+    --line:#262c35; --accent:#6aa6f5; --accent-soft:#17263c;
+    --code-bg:#0d1014; --code-fg:#cdd4de; --badge-bonus-bg:#242a33; --badge-bonus-fg:#9aa3b0;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101317; --surface:#171b21; --fg:#e6e9ee; --muted:#9aa3b0;
+  --line:#262c35; --accent:#6aa6f5; --accent-soft:#17263c;
+  --code-bg:#0d1014; --code-fg:#cdd4de; --badge-bonus-bg:#242a33; --badge-bonus-fg:#9aa3b0;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.6; font-size:16px;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 16px}
+header{padding:56px 0 36px; border-bottom:1px solid var(--line)}
+h1{font-size:2.3rem; line-height:1.15; margin:0 0 10px; letter-spacing:-.02em}
+.lede{color:var(--muted); margin:0 0 20px; max-width:62ch}
+.pill{
+  display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.85rem; background:var(--accent-soft); color:var(--accent);
+  border:1px solid var(--line); border-radius:999px; padding:4px 14px;
+}
+h2{font-size:1.35rem; margin:48px 0 6px; letter-spacing:-.01em}
+h2+.sub{color:var(--muted); margin:0 0 20px; font-size:.95rem}
+.diagram{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:12px; padding:18px; overflow-x:auto;
+}
+.diagram svg{display:block; min-width:640px; width:100%; height:auto; color:var(--muted)}
+table{width:100%; border-collapse:collapse; font-size:.93rem; margin:0}
+.tablewrap{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow-x:auto}
+th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+tr:last-child td{border-bottom:none}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.88em;
+  background:var(--code-bg); color:var(--code-fg); padding:1px 5px; border-radius:4px;
+}
+.grid{display:grid; gap:16px; grid-template-columns:1fr; margin-top:20px}
+@media(min-width:760px){ .grid{grid-template-columns:1fr 1fr} }
+.card{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:12px; padding:20px; display:flex; flex-direction:column; min-width:0;
+}
+.card-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+.card h3{margin:0; font-size:1.08rem; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.badge{font-size:.68rem; font-weight:700; letter-spacing:.06em; padding:3px 8px; border-radius:5px}
+.badge.m{background:var(--accent-soft); color:var(--accent)}
+.badge.b{background:var(--badge-bonus-bg); color:var(--badge-bonus-fg)}
+.meta{color:var(--muted); font-size:.82rem; margin:0 0 12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.card p{margin:0 0 14px; font-size:.94rem}
+.card .ex{margin-top:auto}
+.ex-label{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px}
+pre{
+  margin:0; background:var(--code-bg); border:1px solid var(--line); border-radius:8px;
+  padding:12px 14px; overflow-x:auto; font-size:.84rem; line-height:1.55;
+}
+pre code{background:none; padding:0; color:var(--code-fg)}
+.note{
+  background:var(--accent-soft); border:1px solid var(--line); border-left:3px solid var(--accent);
+  border-radius:8px; padding:14px 16px; font-size:.92rem; margin:20px 0 0;
+}
+footer{margin:56px 0 40px; padding-top:24px; border-top:1px solid var(--line);
+  color:var(--muted); font-size:.88rem}
+</style>
 </head>
 <body>
-    <h1>Chat</h1>
-    <p>Welcome to the chat page!</p>
+<div class="wrap">
+
+<header>
+  <h1>Inception</h1>
+  <p class="lede">A small web infrastructure built from scratch with Docker Compose: nine services,
+  each in its own container, built from our own Dockerfiles on Alpine Linux. NGINX is the only way to
+  the web services, over HTTPS with TLS 1.2 / 1.3 only. The bonus FTP server is the one other door in.</p>
+  <span class="pill">https://rapoggi.42.fr</span>
+</header>
+
+<h2>Architecture</h2>
+<p class="sub">Two services are published to the host: NGINX on 443, and FTP on 21 plus its passive range 21000-21010. Everything else is reachable only on the private Docker bridge network.</p>
+<div class="diagram">
+<svg viewBox="0 0 880 430" role="img" aria-label="Request flow: the internet reaches NGINX on 443 and the FTP server on 21, and NGINX forwards to the backend services">
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    </marker>
+  </defs>
+  <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a)" opacity=".75">
+    <path d="M104,165 L148,165"/>
+    <path d="M262,165 C300,165 300,46 326,46"/>
+    <path d="M262,165 C300,165 300,126 326,126"/>
+    <path d="M262,165 C300,165 300,206 326,206"/>
+    <path d="M262,165 C300,165 300,286 326,286"/>
+    <path d="M470,46 L556,46"/>
+    <path d="M470,56 C516,56 510,126 556,126"/>
+    <path d="M470,126 L556,126"/>
+    <path d="M470,286 L556,286"/>
+    <path d="M59,187 L59,374 Q59,384 69,384 L144,384"/>
+    <path d="M262,384 L322,384"/>
+  </g>
+  <g font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" fill="currentColor" opacity=".85">
+    <text x="112" y="158">443</text>
+    <text x="498" y="38">6379</text>
+    <text x="498" y="148">3306</text>
+    <text x="494" y="278">11434</text>
+    <text x="70" y="300">21</text>
+    <text x="70" y="316">21000-21010</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.3">
+    <rect x="14" y="143" width="90" height="44" rx="8" opacity=".6"/>
+    <rect x="148" y="139" width="114" height="52" rx="8" stroke-width="2"/>
+    <rect x="326" y="20" width="144" height="52" rx="8" opacity=".85"/>
+    <rect x="326" y="100" width="144" height="52" rx="8" opacity=".85"/>
+    <rect x="326" y="180" width="144" height="52" rx="8" opacity=".85"/>
+    <rect x="326" y="260" width="144" height="52" rx="8" opacity=".85"/>
+    <rect x="556" y="20" width="130" height="52" rx="8" opacity=".85"/>
+    <rect x="556" y="100" width="130" height="52" rx="8" opacity=".85"/>
+    <rect x="556" y="260" width="130" height="52" rx="8" opacity=".85"/>
+    <rect x="148" y="358" width="114" height="52" rx="8" stroke-width="2"/>
+    <rect x="322" y="358" width="214" height="52" rx="8" opacity=".7" stroke-dasharray="5 4"/>
+  </g>
+  <g font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="currentColor" text-anchor="middle">
+    <text x="59" y="170">Internet</text>
+    <text x="205" y="161" font-weight="700">nginx</text>
+    <text x="205" y="177" font-size="11" opacity=".8">TLS 1.2 / 1.3</text>
+    <text x="398" y="42">wordpress</text>
+    <text x="398" y="58" font-size="11" opacity=".8">php-fpm :9000</text>
+    <text x="398" y="122">adminer</text>
+    <text x="398" y="138" font-size="11" opacity=".8">php-fpm :9000</text>
+    <text x="398" y="202">site</text>
+    <text x="398" y="218" font-size="11" opacity=".8">static :80</text>
+    <text x="398" y="282">chat</text>
+    <text x="398" y="298" font-size="11" opacity=".8">gunicorn :5000</text>
+    <text x="621" y="42">redis</text>
+    <text x="621" y="58" font-size="11" opacity=".8">object cache</text>
+    <text x="621" y="122">mariadb</text>
+    <text x="621" y="138" font-size="11" opacity=".8">database</text>
+    <text x="621" y="282">ollama</text>
+    <text x="621" y="298" font-size="11" opacity=".8">local LLM</text>
+    <text x="205" y="380" font-weight="700">ftp</text>
+    <text x="205" y="396" font-size="11" opacity=".8">vsftpd</text>
+    <text x="429" y="379" font-size="12">wp_data &#183; site_data</text>
+    <text x="429" y="396" font-size="10.5" opacity=".8">volumes shared with wordpress and site</text>
+  </g>
+</svg>
+</div>
+
+<h2>Routing</h2>
+<p class="sub">How NGINX maps each public path to a backend.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Path</th><th>Goes to</th><th>How</th></tr>
+<tr><td><code>/</code></td><td>wordpress</td><td>FastCGI to <code>wordpress:9000</code></td></tr>
+<tr><td><code>/wp-admin/</code></td><td>wordpress</td><td>WordPress administration panel</td></tr>
+<tr><td><code>/adminer.php</code></td><td>adminer</td><td>FastCGI to <code>adminer:9000</code></td></tr>
+<tr><td><code>/site/</code></td><td>site</td><td>HTTP proxy to <code>site:80</code> &mdash; this page</td></tr>
+<tr><td><code>/api/</code></td><td>chat</td><td>HTTP proxy to <code>chat:5000</code></td></tr>
+</table>
+</div>
+<p class="note"><strong>Ollama is deliberately not routed.</strong> The model server is reachable only
+from the <code>chat</code> API inside the Docker network, so nobody from outside can pull, delete or
+query models directly.</p>
+
+<h2>Services</h2>
+<p class="sub">Nine containers, nine Dockerfiles, all built from the same pinned Alpine base.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="card-top"><h3>nginx</h3><span class="badge m">MANDATORY</span></div>
+    <p class="meta">alpine + nginx &middot; port 443 (published)</p>
+    <p>The only way into the web services. It terminates TLS with a self-signed certificate
+    generated on first start, serves WordPress static files straight from the shared volume, and
+    forwards everything else to the right backend. TLS 1.0 and 1.1 are refused.</p>
+    <div class="ex">
+      <p class="ex-label">Check the TLS version</p>
+      <pre><code>openssl s_client -connect rapoggi.42.fr:443 -tls1_2
+openssl s_client -connect rapoggi.42.fr:443 -tls1_1   # fails</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>wordpress</h3><span class="badge m">MANDATORY</span></div>
+    <p class="meta">alpine + php-fpm 8.3 + WP-CLI &middot; port 9000</p>
+    <p>WordPress running under php-fpm, with no web server of its own: NGINX cannot execute PHP,
+    so it hands <code>.php</code> requests over FastCGI. The first start downloads WordPress,
+    writes the config, and creates an administrator plus a second author account.</p>
+    <div class="ex">
+      <p class="ex-label">List the WordPress users</p>
+      <pre><code>docker compose exec wordpress \
+  wp user list --path=/var/www/html --allow-root</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>mariadb</h3><span class="badge m">MANDATORY</span></div>
+    <p class="meta">alpine + mariadb &middot; port 3306</p>
+    <p>The database behind WordPress. It initialises itself on first start: it creates the database
+    and the application user, sets the root password from a Docker secret, and drops the anonymous
+    accounts. The root account stays restricted to <code>localhost</code>.</p>
+    <div class="ex">
+      <p class="ex-label">Open a SQL shell</p>
+      <pre><code>docker compose exec mariadb \
+  mariadb -u wpuser -p wordpress</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>redis</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + redis &middot; port 6379</p>
+    <p>A persistent object cache for WordPress. By default WordPress caches database results only
+    for the duration of a single request; the Redis drop-in keeps them between requests, so repeated
+    queries never reach MariaDB. Nothing is written to disk &mdash; it is a pure cache, capped at 64 MB
+    with LRU eviction.</p>
+    <div class="ex">
+      <p class="ex-label">Confirm the cache is live</p>
+      <pre><code>docker compose exec wordpress \
+  wp redis status --path=/var/www/html --allow-root
+docker compose exec redis redis-cli dbsize</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>ftp</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + vsftpd &middot; ports 21, 21000-21010</p>
+    <p>Read and write access to the WordPress files and to this static site, for editing content
+    without rebuilding an image. The login is chrooted and runs as the same user that owns the web
+    files, so uploads are immediately usable. Passive mode is used, since the data connection has to
+    be opened by the client through Docker's NAT.</p>
+    <div class="ex">
+      <p class="ex-label">List both volumes over FTP</p>
+      <pre><code>ftp 127.0.0.1
+# or:
+curl --disable-epsv -u ftpuser ftp://127.0.0.1/</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>adminer</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + php-fpm 8.3 &middot; port 9000</p>
+    <p>A single-file database manager for browsing tables, running queries and exporting data.
+    Like WordPress it is pure PHP with no web server, so NGINX reaches it over FastCGI. It connects
+    to MariaDB over the Docker network as the application user.</p>
+    <div class="ex">
+      <p class="ex-label">Log in at /adminer.php</p>
+      <pre><code>System:   MySQL
+Server:   mariadb
+Username: wpuser
+Database: wordpress</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>site</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + nginx &middot; port 80</p>
+    <p>The static showcase you are reading. Plain HTML and CSS, no PHP and no JavaScript framework,
+    served by a minimal second NGINX. Its files live in their own volume, so they can be replaced
+    over FTP without touching the image.</p>
+    <div class="ex">
+      <p class="ex-label">Publish a new page</p>
+      <pre><code>curl --disable-epsv -u ftpuser -T index.html \
+  ftp://127.0.0.1/site_data/index.html</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>ollama</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + ollama &middot; port 11434 (internal only)</p>
+    <p>A local language-model server. Models are stored in a dedicated volume so they survive
+    rebuilds, and they are pulled on demand with a Makefile target rather than at container start.
+    Everything runs on the CPU, inside the VM: no prompt ever leaves the machine.</p>
+    <div class="ex">
+      <p class="ex-label">Pull and list models</p>
+      <pre><code>make pull-model
+docker compose exec ollama ollama list</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><h3>chat</h3><span class="badge b">BONUS</span></div>
+    <p class="meta">alpine + Flask on gunicorn &middot; port 5000</p>
+    <p>A small HTTP API in front of Ollama, and the only component allowed to talk to it. Running
+    under gunicorn rather than the Flask development server gives it a supervising master process,
+    several workers and proper signal handling.</p>
+    <div class="ex">
+      <p class="ex-label">Ask the model a question</p>
+      <pre><code>curl -k https://rapoggi.42.fr/api/ping
+
+curl -k -X POST https://rapoggi.42.fr/api/chat \
+  -d 'message=Explain Docker volumes in one sentence'</code></pre>
+    </div>
+  </div>
+
+</div>
+
+<h2>Data and persistence</h2>
+<p class="sub">Four Docker named volumes, stored on the host so the data outlives the containers.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Volume</th><th>Used by</th><th>Contents</th><th>Host path</th></tr>
+<tr><td><code>db_data</code></td><td>mariadb</td><td>The WordPress database</td><td><code>~/data/mariadb</code></td></tr>
+<tr><td><code>wp_data</code></td><td>wordpress, nginx, ftp</td><td>WordPress files and uploads</td><td><code>~/data/wordpress</code></td></tr>
+<tr><td><code>site_data</code></td><td>site, ftp</td><td>This static site</td><td><code>~/data/site</code></td></tr>
+<tr><td><code>ollama_data</code></td><td>ollama</td><td>Downloaded models</td><td><code>~/data/ollama</code></td></tr>
+</table>
+</div>
+<p class="note">These stay Docker <strong>named volumes</strong>, not bind mounts. The <code>local</code>
+driver is given <code>type: none</code>, <code>o: bind</code> and a <code>device</code> path, which is
+what puts their data under <code>/home/&lt;login&gt;/data</code> while Docker keeps managing them.</p>
+
+<h2>Running it</h2>
+<p class="sub">Everything goes through the Makefile at the root of the repository.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Command</th><th>What it does</th></tr>
+<tr><td><code>make</code></td><td>Generate missing secrets, create the data directories, build and start</td></tr>
+<tr><td><code>make pull-model</code></td><td>Download the language model into the Ollama volume</td></tr>
+<tr><td><code>make down</code></td><td>Stop and remove the containers, keeping all data</td></tr>
+<tr><td><code>make clean</code></td><td>Also remove the volumes and the built images</td></tr>
+<tr><td><code>make fclean</code></td><td>Also delete the data directory &mdash; everything is lost</td></tr>
+<tr><td><code>make re</code></td><td><code>fclean</code> then a full rebuild</td></tr>
+</table>
+</div>
+
+<footer>
+  Built for the 42 curriculum. Replace <code>rapoggi</code> with your own login in every
+  command and URL on this page.
+</footer>
+
+</div>
 </body>
 </html>
