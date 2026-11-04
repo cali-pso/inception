@@ -9,6 +9,7 @@ SECRETS  = secrets/db_password.txt secrets/db_root_password.txt \
 		   secrets/ftp_password.txt
 
 all: secrets
+	echo "127.0.0.1 rapoggi.42.fr" | sudo tee -a /etc/hosts
 	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress $(DATA_DIR)/site $(DATA_DIR)/ollama
 	$(COMPOSE) up -d --build
 
