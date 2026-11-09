@@ -33,10 +33,25 @@ wp config set WP_REDIS_PORT 6379 --raw --path="$WP_PATH" --allow-root
 wp config set WP_REDIS_GRACEFUL true --raw --path="$WP_PATH" --allow-root
 
 if ! wp plugin is-installed redis-cache --path="$WP_PATH" --allow-root; then
-    wp plugin install redis-cache --activate --path="$WP_PATH" --allow-root || \
-        echo "warning: redis-cache install failed, continuing without object cache"
+    wp plugin install redis-cache --activate --path="$WP_PATH" --allow-root || true
 fi
-wp redis enable --path="$WP_PATH" --allow-root || true
+
+if wp plugin is-installed redis-cache --path="$WP_PATH" --allow-root; then
+    wp redis enable --path="$WP_PATH" --allow-root || true
+fi
+
+# The object cache is a bonus: a failure here must never stop WordPress from
+# serving, but it must not pass unnoticed either. Report the real state loudly.
+if wp redis status --path="$WP_PATH" --allow-root 2>/dev/null | grep -q "^Status: Connected"; then
+    echo "[redis] object cache ACTIVE"
+else
+    echo "############################################################"
+    echo "# WARNING: the Redis object cache is NOT active."
+    echo "# WordPress still serves pages, but the Redis bonus is off."
+    echo "# Usual cause: the plugin download failed (no network)."
+    echo "# Check connectivity, then run: make re"
+    echo "############################################################"
+fi
 
 chown -R www-data:www-data "$WP_PATH"
 exec php-fpm83 -F
