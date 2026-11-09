@@ -31,7 +31,6 @@ Prerequisites: a Linux VM with Docker, Docker Compose v2, `make` and `openssl`.
 
 ```bash
 cp srcs/.env.example srcs/.env      # then edit values (login, domain, users)
-echo "127.0.0.1 rapoggi.42.fr" | sudo tee -a /etc/hosts
 make                                # generates secrets, builds, starts
 ```
 
