@@ -10,7 +10,7 @@ SECRETS  = secrets/db_password.txt secrets/db_root_password.txt \
 		   secrets/ftp_password.txt
 
 all: secrets hosts
-	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress $(DATA_DIR)/site $(DATA_DIR)/ollama
+	sudo mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress $(DATA_DIR)/site $(DATA_DIR)/ollama
 	$(COMPOSE) up -d --build
 
 # Generate any missing secret file with a random password (never overwrites).
