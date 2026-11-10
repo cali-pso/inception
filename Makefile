@@ -3,7 +3,7 @@ LOGIN    = $(shell sed -n 's/^LOGIN=//p' srcs/.env)
 OLLAMA_MODEL    = $(shell sed -n 's/^OLLAMA_MODEL=//p' srcs/.env)
 DOMAIN   = $(LOGIN).42.fr
 
-COMPOSE  = docker compose -f srcs/docker-compose.yml
+COMPOSE  = sudo docker compose -f srcs/docker-compose.yml
 DATA_DIR = /home/$(LOGIN)/data
 SECRETS  = secrets/db_password.txt secrets/db_root_password.txt \
            secrets/wp_password.txt secrets/wp_admin_password.txt \
